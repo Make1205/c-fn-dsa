@@ -1,0 +1,250 @@
+{
+  "algorithm_objects": {
+    "ymm": 8976,
+    "zmm": 0,
+    "legacy_sse": 0,
+    "vzeroupper": 203,
+    "cpuid": 2
+  },
+  "whole_driver": {
+    "counts": {
+      "ymm": 8813,
+      "zmm": 7,
+      "legacy_sse": 0,
+      "vzeroupper": 186,
+      "cpuid": 2
+    },
+    "legacy_sse_and_cpuid_sites": [
+      {
+        "symbol": "fndsa_has_avx2",
+        "instruction": "cpuid"
+      },
+      {
+        "symbol": "fndsa_has_avx2",
+        "instruction": "cpuid"
+      }
+    ]
+  },
+  "objects": {
+    "0.o": {
+      "counts": {
+        "ymm": 0,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 0,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "1.o": {
+      "counts": {
+        "ymm": 1300,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 18,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "10.o": {
+      "counts": {
+        "ymm": 1960,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 43,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "11.o": {
+      "counts": {
+        "ymm": 153,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 3,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "12.o": {
+      "counts": {
+        "ymm": 32,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 8,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "13.o": {
+      "counts": {
+        "ymm": 2,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 1,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "14.o": {
+      "counts": {
+        "ymm": 0,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 0,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "15.o": {
+      "counts": {
+        "ymm": 0,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 0,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "16.o": {
+      "counts": {
+        "ymm": 23,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 11,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "17.o": {
+      "counts": {
+        "ymm": 32,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 8,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "2.o": {
+      "counts": {
+        "ymm": 18,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 3,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "3.o": {
+      "counts": {
+        "ymm": 0,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 0,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "4.o": {
+      "counts": {
+        "ymm": 0,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 0,
+        "cpuid": 2
+      },
+      "legacy_sse_and_cpuid_sites": [
+        {
+          "symbol": "fndsa_has_avx2",
+          "instruction": "cpuid"
+        },
+        {
+          "symbol": "fndsa_has_avx2",
+          "instruction": "cpuid"
+        }
+      ]
+    },
+    "5.o": {
+      "counts": {
+        "ymm": 1540,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 24,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "6.o": {
+      "counts": {
+        "ymm": 1000,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 22,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "7.o": {
+      "counts": {
+        "ymm": 14,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 2,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "8.o": {
+      "counts": {
+        "ymm": 1366,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 10,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "9.o": {
+      "counts": {
+        "ymm": 1536,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 50,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "cpucycles.o": {
+      "counts": {
+        "ymm": 0,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 0,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "driver.o": {
+      "counts": {
+        "ymm": 28,
+        "zmm": 0,
+        "legacy_sse": 0,
+        "vzeroupper": 4,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    },
+    "speed_print.o": {
+      "counts": {
+        "ymm": 8,
+        "zmm": 7,
+        "legacy_sse": 0,
+        "vzeroupper": 4,
+        "cpuid": 0
+      },
+      "legacy_sse_and_cpuid_sites": []
+    }
+  },
+  "note": "Static counts are not executed instruction counts. Printer/timer code outside timed APIs is counted separately; shared libraries are excluded."
+}

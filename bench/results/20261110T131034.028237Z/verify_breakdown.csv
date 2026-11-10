@@ -1,0 +1,7 @@
+parameter,build,clean_before,iterations,pk_decode_kcycles,core_verify_kcycles,instrumented_total_kcycles,dispatch_detect_kcycles
+FN-DSA-512,ref,False,11,1.325,34.319,35.645,0.0
+FN-DSA-512,avx2,False,11,1.143,52.779,54.027,23.087
+FN-DSA-512,avx2,True,11,1.273,56.237,57.511,24.465
+FN-DSA-1024,ref,False,11,2.391,65.571,67.963,0.0
+FN-DSA-1024,avx2,False,11,2.313,84.317,86.605,23.997
+FN-DSA-1024,avx2,True,11,2.287,84.031,86.319,24.543

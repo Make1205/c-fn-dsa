@@ -1,0 +1,74 @@
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-ref/driver generate 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-ref.vectors
+META 512 12289 897 1345 666
+LENGTH 65491 100 650 661
+PASS generate
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-avx2/driver generate 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-avx2.vectors
+META 512 12289 897 1345 666
+LENGTH 65491 100 650 661
+PASS generate
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-soft/driver generate 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-soft.vectors
+META 512 12289 897 1345 666
+LENGTH 65491 100 650 661
+PASS generate
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-ref/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-avx2.vectors
+META 512 12289 897 1345 666
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-ref/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-soft.vectors
+META 512 12289 897 1345 666
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-avx2/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-ref.vectors
+META 512 12289 897 1345 666
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-avx2/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-soft.vectors
+META 512 12289 897 1345 666
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-soft/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-ref.vectors
+META 512 12289 897 1345 666
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-soft/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-avx2.vectors
+META 512 12289 897 1345 666
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-ref/driver generate 1 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/diagnostics/local-case-3462/ref.vectors 3461
+META 512 12289 897 1345 666
+LENGTH 655 1 655 655
+PASS generate
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-avx2/driver generate 1 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/diagnostics/local-case-3462/avx2.vectors 3461
+META 512 12289 897 1345 666
+LENGTH 655 1 655 655
+PASS generate
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-ref/driver check 1 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/diagnostics/local-case-3462/avx2.vectors 3461
+META 512 12289 897 1345 666
+PASS cross 1
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-512-avx2/driver check 1 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/diagnostics/local-case-3462/ref.vectors 3461
+META 512 12289 897 1345 666
+PASS cross 1
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-ref/driver generate 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-ref.vectors
+META 1024 12289 1793 2369 1280
+LENGTH 127075 100 1264 1278
+PASS generate
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-avx2/driver generate 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-avx2.vectors
+META 1024 12289 1793 2369 1280
+LENGTH 127075 100 1264 1278
+PASS generate
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-soft/driver generate 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-soft.vectors
+META 1024 12289 1793 2369 1280
+LENGTH 127075 100 1264 1278
+PASS generate
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-ref/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-avx2.vectors
+META 1024 12289 1793 2369 1280
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-ref/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-soft.vectors
+META 1024 12289 1793 2369 1280
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-avx2/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-ref.vectors
+META 1024 12289 1793 2369 1280
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-avx2/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-soft.vectors
+META 1024 12289 1793 2369 1280
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-soft/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-ref.vectors
+META 1024 12289 1793 2369 1280
+PASS cross 100
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-soft/driver check 100 /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-avx2.vectors
+META 1024 12289 1793 2369 1280
+PASS cross 100

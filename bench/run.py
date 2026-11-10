@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import csv,datetime,hashlib,io,itertools,json,os,platform,re,shutil,subprocess,sys,tarfile
 from audit_vectors import inspect_pair
+from verify_diagnostics import run_profiles
 import fma_audit
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
@@ -134,6 +135,7 @@ def main():
  (out/'timings.json').write_text(json.dumps(results,indent=2)+'\n')
  with (out/'bench.csv').open('w',newline='') as f:
   w=csv.DictWriter(f,fieldnames=list(results[0]),lineterminator='\n');w.writeheader();w.writerows(results)
+ profile_text=run_profiles(stage,out,CFG,BASE,CC,call,nt,pk_ntt=False)
  lookup={(x['set'],x['build'],x['operation']):x['kcycles'] for x in results}
  s='# '+CFG['scheme']+' — '+meta['scale']+'\n\n'
  s+='QUICK is a workflow check only. Full-scale figures are measured locally.\n\n' if quick else 'Full-scale local benchmark.\n\n'
@@ -179,6 +181,7 @@ def main():
  s+='\nCorrectness: all configured upstream KAT/self-tests passed; all generated signatures verified; changed messages rejected. Cross-build/equality details are in correctness.json.\n\n'
  s+='\nTargeted regression: local case 3462 (zero-based 3461) is replayed directly in addition to the normal corpus; ref/AVX2 byte equality and both cross-verification directions are required. See diagnostics/local-case-3462/report.json.\n'
  s+='\nFMA audit: compiler contraction disabled; zero FMA instructions in every linked driver and benchmark-owned object. See *-fma-audit.json.\n'
+ s+=profile_text+'\n'
  s+=CFG.get('notes','')+'\n\nBuild flags and commands per variant are in config.json, metadata.json and build logs. All source is extracted locally from the tested commit; algorithm files are unchanged. See bench/NOTES.md.\n'
  (out/'SUMMARY.md').write_text(s)
  print('PASS:',out/'SUMMARY.md',flush=True)

@@ -1,0 +1,23 @@
+$ /workspace/c-fn-dsa/bench/results/20261110T131034.028237Z/work/FN-DSA-1024-avx2/verify_profile 11
+PROFILE_META 11 0 0 1 2 0 1
+PKDecode
+median: 2313 cycles/ticks
+average: 2310 cycles/ticks
+
+CoreVerify
+median: 84317 cycles/ticks
+average: 89457 cycles/ticks
+
+VerifyInstrumented
+median: 86605 cycles/ticks
+average: 91769 cycles/ticks
+
+DispatchDetect
+median: 23997 cycles/ticks
+average: 26805 cycles/ticks
+
+SignInstrumented
+median: 843153 cycles/ticks
+average: 844989 cycles/ticks
+
+SIGN_DISPATCH_CALLS 0 0 11

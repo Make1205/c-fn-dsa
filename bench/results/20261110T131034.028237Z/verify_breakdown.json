@@ -1,0 +1,158 @@
+[
+  {
+    "sign_dispatch_calls": [
+      0,
+      0,
+      11
+    ],
+    "set": "FN-DSA-512",
+    "build": "ref",
+    "clean_before": false,
+    "iterations": 11,
+    "pk_includes_ntt": false,
+    "hooks": [
+      11,
+      0,
+      0,
+      1,
+      2,
+      0,
+      0
+    ],
+    "cycles": {
+      "PKDecode": 1325,
+      "CoreVerify": 34319,
+      "VerifyInstrumented": 35645,
+      "SignInstrumented": 436097
+    }
+  },
+  {
+    "sign_dispatch_calls": [
+      0,
+      0,
+      11
+    ],
+    "set": "FN-DSA-512",
+    "build": "avx2",
+    "clean_before": false,
+    "iterations": 11,
+    "pk_includes_ntt": false,
+    "hooks": [
+      11,
+      0,
+      0,
+      1,
+      2,
+      0,
+      1
+    ],
+    "cycles": {
+      "PKDecode": 1143,
+      "CoreVerify": 52779,
+      "VerifyInstrumented": 54027,
+      "DispatchDetect": 23087,
+      "SignInstrumented": 424085
+    }
+  },
+  {
+    "sign_dispatch_calls": null,
+    "set": "FN-DSA-512",
+    "build": "avx2",
+    "clean_before": true,
+    "iterations": 11,
+    "pk_includes_ntt": false,
+    "hooks": [
+      11,
+      1,
+      0,
+      1,
+      2,
+      0,
+      1
+    ],
+    "cycles": {
+      "PKDecode": 1273,
+      "CoreVerify": 56237,
+      "VerifyInstrumented": 57511,
+      "DispatchDetect": 24465
+    }
+  },
+  {
+    "sign_dispatch_calls": [
+      0,
+      0,
+      11
+    ],
+    "set": "FN-DSA-1024",
+    "build": "ref",
+    "clean_before": false,
+    "iterations": 11,
+    "pk_includes_ntt": false,
+    "hooks": [
+      11,
+      0,
+      0,
+      1,
+      2,
+      0,
+      0
+    ],
+    "cycles": {
+      "PKDecode": 2391,
+      "CoreVerify": 65571,
+      "VerifyInstrumented": 67963,
+      "SignInstrumented": 889797
+    }
+  },
+  {
+    "sign_dispatch_calls": [
+      0,
+      0,
+      11
+    ],
+    "set": "FN-DSA-1024",
+    "build": "avx2",
+    "clean_before": false,
+    "iterations": 11,
+    "pk_includes_ntt": false,
+    "hooks": [
+      11,
+      0,
+      0,
+      1,
+      2,
+      0,
+      1
+    ],
+    "cycles": {
+      "PKDecode": 2313,
+      "CoreVerify": 84317,
+      "VerifyInstrumented": 86605,
+      "DispatchDetect": 23997,
+      "SignInstrumented": 843153
+    }
+  },
+  {
+    "sign_dispatch_calls": null,
+    "set": "FN-DSA-1024",
+    "build": "avx2",
+    "clean_before": true,
+    "iterations": 11,
+    "pk_includes_ntt": false,
+    "hooks": [
+      11,
+      1,
+      0,
+      1,
+      2,
+      0,
+      1
+    ],
+    "cycles": {
+      "PKDecode": 2287,
+      "CoreVerify": 84031,
+      "VerifyInstrumented": 86319,
+      "DispatchDetect": 24543
+    }
+  }
+]

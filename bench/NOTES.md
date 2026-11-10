@@ -294,3 +294,69 @@ single targeted regression. No algorithm implementation has been changed.
 
 For this paper's measurement c-fn-dsa is primary; VecFalcon is backup. Version
 and encoding differences from the older VecFalcon remain documented above.
+
+
+## 2026-11-10: native ref ISA and Falcon performance diagnosis
+
+Main public-API timing is unchanged. `verify_profile.c` is a separate bench-only
+linker-hook diagnostic; it never patches algorithm sources, caches CPU detection,
+or bypasses the public API. `profile_verify.py RESULT_DIRECTORY` reuses that
+result's original algorithm objects and adds VERIFY_DIAGNOSTICS.md, a CSV/JSON
+breakdown and static ISA inventory. Existing successful FULL main numbers remain
+valid; profiling them does not require rerunning the main benchmark. Keep the
+result's work/source directory. Use the same GCC version as the original build.
+
+Ref explicitly selects hardware floating point/SSE2 and disables AVX ISA generation
+(-mno-avx -mno-avx2 -mno-avx512f -mno-fma). Counting algorithm objects, not just
+the executable, finds ZERO YMM instructions in ref. The executable has eight
+YMM instructions in unmodified speed_print.o (statistics after timing), which
+are not an AVX2 algorithm backend. See *-isa.json for separate counts and sites.
+
+Both variants start Verify with serialized public keys and perform the same
+logical decoding, hashing and verification. AVX2 does not pre-expand extra key
+material. Its public entry calls fndsa_has_avx2() without caching. util.c uses
+__get_cpuid_count(7,0), which emits two serializing CPUID instructions (maximum
+leaf query then leaf 7), plus XGETBV. The scalar build compiles this dispatch
+away. This is original library behavior, retained inside the main timing.
+
+The AVX2 algorithm objects have zero legacy SSE instructions and include
+vzeroupper at returns; the scalar objects use legacy SSE and no AVX. Therefore
+there is no evidence for an internal legacy-SSE/AVX transition as the principal
+Verify penalty. Static counts exclude shared libraries and are not dynamic
+execution counts. A second diagnostic inserts vzeroupper BEFORE the timed call;
+it did not consistently reduce the QUICK measurements. These observations do
+not prove all platform/library transition overhead is absent.
+
+PK timing continuously brackets original mqpoly_decode and the initial key
+representation preparation. Remaining core includes dispatch, public-key/message
+hashing, signature decoding and verification arithmetic. Hooks add timing and
+call overhead. Per-sample total minus PK yields core, then each median is taken;
+medians need not add. These are diagnostics, not replacement publication numbers.
+The Sign diagnostic also reports CPU-detection calls per fresh-key signature.
+
+Cloud tests use QUICK=1 only. CPUID is particularly expensive on this cloud CPU:
+about 23-24 thousand ticks per c-fn-dsa AVX2 Verify. This constant offset is
+consistent with the user's 25.4k/23.1k gaps for n=512/1024, but is NOT a measurement
+of the user's CPU. Run the diagnostic locally before assigning its exact share.
+No universal AVX2 speedup or SSE-transition explanation is inferred from QUICK.
+
+Local command (after fetching bench; select an existing successful FULL result):
+
+```bash
+python3 bench/profile_verify.py bench/results/<FULL-directory>
+```
+
+A new `bash bench/run.sh` also includes these diagnostics automatically. Ref/AVX2
+byte equality and cross-verification remain mandatory. All variants retain
+-ffp-contract=off and the zero-FMA audit. c-fn-dsa is the paper's primary Falcon
+measurement; VecFalcon is the alternative implementation.
+
+This version stores the public key in NTT wire form; both backends decode it and
+convert external to internal coefficients, with NO public-key NTT. Cloud QUICK
+n=512 ref/AVX2 PK = 1.325/1.143k, remaining core = 34.319/52.779k,
+AVX2 dispatch = 23.087k; n=1024 PK = 2.391/2.313k, core = 65.571/84.317k,
+dispatch = 23.997k (20261110T131034.028237Z). Ref algorithm YMM=0;
+AVX2 algorithm YMM=8976, legacy SSE=0, vzeroupper=203.
+The current Sign FP kernel is the SSE2 hardware path in both builds; this source
+version performs no AVX2 CPU dispatch during Sign. QUICK confirmed zero detection
+calls. Similar Sign timings therefore do not indicate a wrongly selected ref.

@@ -1,0 +1,14 @@
+[
+  {
+    "set": "FN-DSA-512",
+    "count_each": 100,
+    "cross_builds": true,
+    "byte_equal": true
+  },
+  {
+    "set": "FN-DSA-1024",
+    "count_each": 100,
+    "cross_builds": true,
+    "byte_equal": true
+  }
+]

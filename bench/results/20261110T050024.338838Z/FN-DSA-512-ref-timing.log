@@ -1,0 +1,14 @@
+$ /workspace/c-fn-dsa/bench/results/20261110T050024.338838Z/work/FN-DSA-512-ref/driver time 11
+META 512 12289 897 1345 666
+KeyGen
+median: 7519667 cycles/ticks
+average: 7886875 cycles/ticks
+
+Sign
+median: 4676437 cycles/ticks
+average: 4765527 cycles/ticks
+
+Verify
+median: 41053 cycles/ticks
+average: 41443 cycles/ticks
+

@@ -1,0 +1,245 @@
+{
+  "scale": "QUICK",
+  "timing_iterations": 11,
+  "signatures": 100,
+  "cpu": "AMD EPYC 9V45 96-Core Processor",
+  "affinity": 0,
+  "gcc": "gcc (Debian 14.2.0-19) 14.2.0",
+  "benchmark_commit": "1b858880dcac091b5e5f84f0e4d8617c35ba1392",
+  "tested_commit": "1b858880dcac091b5e5f84f0e4d8617c35ba1392",
+  "initial_commit": "1b858880dcac091b5e5f84f0e4d8617c35ba1392",
+  "initial_status": "?? bench/\n",
+  "flags": [
+    "-O3",
+    "-march=native",
+    "-std=gnu11"
+  ],
+  "configuration": {
+    "scheme": "FN-DSA \u2014 c-fn-dsa cross-check",
+    "initial_commit": "1b858880dcac091b5e5f84f0e4d8617c35ba1392",
+    "tested_commit": "1b858880dcac091b5e5f84f0e4d8617c35ba1392",
+    "sets": [
+      {
+        "name": "FN-DSA-512",
+        "paper_pk": 897,
+        "paper_sig": 666,
+        "paper_q": 12289,
+        "require_equal": true,
+        "variants": [
+          {
+            "name": "ref",
+            "cwd": ".",
+            "flags": [
+              "-DLOGN=9",
+              "-DFNDSA_AVX2=0",
+              "-DFNDSA_SSE2=0",
+              "-DFNDSA_NEON=0",
+              "-ffunction-sections",
+              "-fdata-sections",
+              "-fno-tree-vectorize",
+              "-fno-tree-slp-vectorize"
+            ],
+            "sources": [
+              "codec.c",
+              "mq.c",
+              "sha3.c",
+              "sysrng.c",
+              "util.c",
+              "kgen.c",
+              "kgen_fxp.c",
+              "kgen_gauss.c",
+              "kgen_mp31.c",
+              "kgen_ntru.c",
+              "kgen_poly.c",
+              "kgen_zint31.c",
+              "sign.c",
+              "sign_core.c",
+              "sign_fpoly.c",
+              "sign_fpr.c",
+              "sign_sampler.c",
+              "vrfy.c"
+            ],
+            "extra_sources": [],
+            "libs": [
+              "-Wl,--gc-sections"
+            ],
+            "kat": [
+              {
+                "name": "kat",
+                "sources": [
+                  "bench/native_kat.c"
+                ],
+                "expect": "PASS native KAT"
+              }
+            ]
+          },
+          {
+            "name": "avx2",
+            "cwd": ".",
+            "flags": [
+              "-DLOGN=9",
+              "-DFNDSA_AVX2=1",
+              "-DFNDSA_SSE2=1",
+              "-DFNDSA_NEON=0",
+              "-ffunction-sections",
+              "-fdata-sections",
+              "-mavx2",
+              "-mno-avx512f"
+            ],
+            "sources": [
+              "codec.c",
+              "mq.c",
+              "sha3.c",
+              "sysrng.c",
+              "util.c",
+              "kgen.c",
+              "kgen_fxp.c",
+              "kgen_gauss.c",
+              "kgen_mp31.c",
+              "kgen_ntru.c",
+              "kgen_poly.c",
+              "kgen_zint31.c",
+              "sign.c",
+              "sign_core.c",
+              "sign_fpoly.c",
+              "sign_fpr.c",
+              "sign_sampler.c",
+              "vrfy.c"
+            ],
+            "extra_sources": [],
+            "libs": [
+              "-Wl,--gc-sections"
+            ],
+            "kat": [
+              {
+                "name": "kat",
+                "sources": [
+                  "bench/native_kat.c"
+                ],
+                "expect": "PASS native KAT"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "FN-DSA-1024",
+        "paper_pk": 1793,
+        "paper_sig": 1280,
+        "paper_q": 12289,
+        "require_equal": true,
+        "variants": [
+          {
+            "name": "ref",
+            "cwd": ".",
+            "flags": [
+              "-DLOGN=10",
+              "-DFNDSA_AVX2=0",
+              "-DFNDSA_SSE2=0",
+              "-DFNDSA_NEON=0",
+              "-ffunction-sections",
+              "-fdata-sections",
+              "-fno-tree-vectorize",
+              "-fno-tree-slp-vectorize"
+            ],
+            "sources": [
+              "codec.c",
+              "mq.c",
+              "sha3.c",
+              "sysrng.c",
+              "util.c",
+              "kgen.c",
+              "kgen_fxp.c",
+              "kgen_gauss.c",
+              "kgen_mp31.c",
+              "kgen_ntru.c",
+              "kgen_poly.c",
+              "kgen_zint31.c",
+              "sign.c",
+              "sign_core.c",
+              "sign_fpoly.c",
+              "sign_fpr.c",
+              "sign_sampler.c",
+              "vrfy.c"
+            ],
+            "extra_sources": [],
+            "libs": [
+              "-Wl,--gc-sections"
+            ],
+            "kat": [
+              {
+                "name": "kat",
+                "sources": [
+                  "bench/native_kat.c"
+                ],
+                "expect": "PASS native KAT"
+              }
+            ]
+          },
+          {
+            "name": "avx2",
+            "cwd": ".",
+            "flags": [
+              "-DLOGN=10",
+              "-DFNDSA_AVX2=1",
+              "-DFNDSA_SSE2=1",
+              "-DFNDSA_NEON=0",
+              "-ffunction-sections",
+              "-fdata-sections",
+              "-mavx2",
+              "-mno-avx512f"
+            ],
+            "sources": [
+              "codec.c",
+              "mq.c",
+              "sha3.c",
+              "sysrng.c",
+              "util.c",
+              "kgen.c",
+              "kgen_fxp.c",
+              "kgen_gauss.c",
+              "kgen_mp31.c",
+              "kgen_ntru.c",
+              "kgen_poly.c",
+              "kgen_zint31.c",
+              "sign.c",
+              "sign_core.c",
+              "sign_fpoly.c",
+              "sign_fpr.c",
+              "sign_sampler.c",
+              "vrfy.c"
+            ],
+            "extra_sources": [],
+            "libs": [
+              "-Wl,--gc-sections"
+            ],
+            "kat": [
+              {
+                "name": "kat",
+                "sources": [
+                  "bench/native_kat.c"
+                ],
+                "expect": "PASS native KAT"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "dependencies": [],
+    "notes": "Cross-check implementation only; paper Falcon performance is from VecFalcon. This revision documents a 2026 best guess of future FIPS 206, not a published final standard. Compared with VecFalcon 61b326e: public keys are NTT encoded, encodings/hash-to-point are little-endian, signature infinity norm is capped at 840 instead of 2047, a 64-byte mu binds the hashed public key/context/message, secret keys include an additional 64-byte public-key hash, the base sampler uses 79 bits rather than 72, and SHAKE256x4 was removed. It is not a drop-in original round-3 Falcon implementation or interoperable wire format with the earlier VecFalcon API, despite the same public-key/signature lengths. Signatures remain padded 666/1280 bytes; exact unpadding parses the LSB-first compressed polynomial and checks against comp_decode. The scalar ref disables SIMD and uses software binary64, AVX2 uses native SIMD/FPU. Native degree-specific transcript KATs are mandatory for both. Public C API exposes only encoded keys; ExpandedSign is unavailable."
+  },
+  "benchmark_hashes": {
+    "speed_print.c": "533fc7bd12204078a5390cfb58c05d550b214850876609f8e98f7377b9d4f1b3",
+    "adapter.h": "1171c8aa69ff54b0ba652c6c3a06557f365dc5fbe06888fee970864967e3a67f",
+    "native_kat.c": "22df839191e6add5273a86ab102dd9b36c772e48c23746df889322246a1950ea",
+    "driver.c": "f6f77dba3d3748af2c760f26025f5a94d720a2529e06aef0cc505c9853090380",
+    "config.json": "8b02c3ea54904f821c36284e1604d61d89f8726047fe93321f8f94c01995bccb",
+    "speed_print.h": "3946b0226c63125664eb443a20d43563e6d1ba7fa3be5c1b952cd29d1477b2ef",
+    "run.py": "8530f7d4f2877ecfa4291b33aed3e658dfb3de7c7b5cad4bce6399659a046f7f",
+    "cpucycles.c": "31cc4c16b1e896b2cf7cc154aa21430329c0047cf9898a1865f9bfe9904f25e4",
+    ".gitignore": "68c8824892a82c4a572123a7baf73b9b687318782f39021fb10ead083095a2fe",
+    "cpucycles.h": "7f1e2b68cf3e3c76076364af3c5350de61442450c477aec809da8de10e131838",
+    "run.sh": "b4297fab34341f6ef53ef6daad6e6173b826476bc2bf92fb634427e2b9e385a2"
+  }
+}

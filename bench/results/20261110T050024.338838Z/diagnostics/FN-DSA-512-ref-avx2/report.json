@@ -1,0 +1,37 @@
+{
+  "left": "/workspace/c-fn-dsa/bench/results/20261110T050024.338838Z/work/FN-DSA-512-ref.vectors",
+  "right": "/workspace/c-fn-dsa/bench/results/20261110T050024.338838Z/work/FN-DSA-512-avx2.vectors",
+  "left_sha256": "648e4b67365332ed3b0951b089b7811d9037198f83338349f252190ff49c5c20",
+  "right_sha256": "648e4b67365332ed3b0951b089b7811d9037198f83338349f252190ff49c5c20",
+  "left_count": 100,
+  "right_count": 100,
+  "pk_equal": true,
+  "sk_equal": true,
+  "byte_equal": true,
+  "differing_signatures": 0,
+  "count_equal": true,
+  "first_difference": null,
+  "first_file_byte_offset": null,
+  "source_run": {
+    "scale": "QUICK",
+    "signatures": 100,
+    "gcc": "gcc (Debian 14.2.0-19) 14.2.0",
+    "cpu": "AMD EPYC 9V45 96-Core Processor",
+    "tested_commit": "1b858880dcac091b5e5f84f0e4d8617c35ba1392",
+    "benchmark_commit": "1b858880dcac091b5e5f84f0e4d8617c35ba1392"
+  },
+  "cross_verification": [
+    {
+      "verifier": "FN-DSA-512-ref",
+      "status": "PASS",
+      "returncode": 0,
+      "output": "META 512 12289 897 1345 666\nPASS cross 100\n"
+    },
+    {
+      "verifier": "FN-DSA-512-avx2",
+      "status": "PASS",
+      "returncode": 0,
+      "output": "META 512 12289 897 1345 666\nPASS cross 100\n"
+    }
+  ]
+}

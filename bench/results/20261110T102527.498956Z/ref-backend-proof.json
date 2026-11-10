@@ -1,0 +1,18 @@
+[
+  {
+    "set": "FN-DSA-512",
+    "scope": "All algorithm and driver object files; timing/printer objects excluded",
+    "hardware_sse_fp_instruction_count": 142,
+    "avx2_or_avx512_register_or_fma_instruction_count": 0,
+    "status": "PASS",
+    "note": "Unchanged speed_print compiled with base -march=native may auto-vectorize postprocessing outside measured API intervals."
+  },
+  {
+    "set": "FN-DSA-1024",
+    "scope": "All algorithm and driver object files; timing/printer objects excluded",
+    "hardware_sse_fp_instruction_count": 142,
+    "avx2_or_avx512_register_or_fma_instruction_count": 0,
+    "status": "PASS",
+    "note": "Unchanged speed_print compiled with base -march=native may auto-vectorize postprocessing outside measured API intervals."
+  }
+]

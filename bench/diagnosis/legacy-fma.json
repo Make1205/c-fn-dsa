@@ -1,0 +1,7 @@
+{
+  "binary": "results/20261110T050024.338838Z/work/FN-DSA-512-avx2/driver",
+  "binary_sha256": "4ea2a553eea634fc3a0ad93bff3ed96fc4e619095e8df1dd8004aa4bbbd293bd",
+  "metadata": "results/20261110T050024.338838Z/metadata.json",
+  "fma_instruction_count": 15,
+  "status": "Observed in old cloud binary, not proof of cause of local FULL mismatch"
+}

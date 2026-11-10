@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "case": "Synthetic parser corruption only; NOT the original local FULL failure",
+  "existing_corpus_signatures": 100,
+  "replayed_index_zero_based": 99,
+  "replay_matches_original_record": true,
+  "three_backend_cross_verification": true,
+  "synthetic_first_difference_offset": 45,
+  "truncated_input_rejected": true,
+  "timing_files_identical_to_lithium": true,
+  "synthetic_compiler_ablation_replay": "PASS; mismatch intentionally injected, correctly reported as not reproduced and cause unresolved",
+  "ablation_fma_counts": {
+    "old-ref": 0,
+    "old-avx2": 15,
+    "avx2-no-contract": 0
+  }
+}

@@ -1,0 +1,13 @@
+$ /usr/bin/gcc -O3 -march=native -std=c99 -DLOGN=9 -DFNDSA_AVX2=0 -DFNDSA_SSE2=1 -DFNDSA_NEON=0 -ffunction-sections -fdata-sections -msse2 -mno-avx -mno-avx2 -mno-avx512f -mno-fma -I. -I/workspace/c-fn-dsa/bench/results/20261110T064444.731460Z/work/source/bench -c codec.c -o /workspace/c-fn-dsa/bench/results/20261110T064444.731460Z/work/FN-DSA-512-ref/0.o
+$ /usr/bin/gcc -O3 -march=native -std=c99 -DLOGN=9 -DFNDSA_AVX2=0 -DFNDSA_SSE2=1 -DFNDSA_NEON=0 -ffunction-sections -fdata-sections -msse2 -mno-avx -mno-avx2 -mno-avx512f -mno-fma -I. -I/workspace/c-fn-dsa/bench/results/20261110T064444.731460Z/work/source/bench -c mq.c -o /workspace/c-fn-dsa/bench/results/20261110T064444.731460Z/work/FN-DSA-512-ref/1.o
+$ /usr/bin/gcc -O3 -march=native -std=c99 -DLOGN=9 -DFNDSA_AVX2=0 -DFNDSA_SSE2=1 -DFNDSA_NEON=0 -ffunction-sections -fdata-sections -msse2 -mno-avx -mno-avx2 -mno-avx512f -mno-fma -I. -I/workspace/c-fn-dsa/bench/results/20261110T064444.731460Z/work/source/bench -c sha3.c -o /workspace/c-fn-dsa/bench/results/20261110T064444.731460Z/work/FN-DSA-512-ref/2.o
+$ /usr/bin/gcc -O3 -march=native -std=c99 -DLOGN=9 -DFNDSA_AVX2=0 -DFNDSA_SSE2=1 -DFNDSA_NEON=0 -ffunction-sections -fdata-sections -msse2 -mno-avx -mno-avx2 -mno-avx512f -mno-fma -I. -I/workspace/c-fn-dsa/bench/results/20261110T064444.731460Z/work/source/bench -c sysrng.c -o /workspace/c-fn-dsa/bench/results/20261110T064444.731460Z/work/FN-DSA-512-ref/3.o
+sysrng.c: In function 'fndsa_sysrng':
+sysrng.c:74:13: error: implicit declaration of function 'getentropy' [-Wimplicit-function-declaration]
+   74 |         if (getentropy(dst, len) == 0) {
+      |             ^~~~~~~~~~
+sysrng.c:79:49: error: 'O_CLOEXEC' undeclared (first use in this function); did you mean 'FD_CLOEXEC'?
+   79 |         int f = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+      |                                                 ^~~~~~~~~
+      |                                                 FD_CLOEXEC
+sysrng.c:79:49: note: each undeclared identifier is reported only once for each function it appears in

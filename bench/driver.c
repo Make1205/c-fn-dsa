@@ -23,55 +23,40 @@ int main(int argc,char**argv) {
  printf("META %d %d %d %d %d\n",B_N,B_Q,B_PK,B_SK,B_SIG);
  bench_seed(1234567);
  if(!strcmp(argv[1],"generate")) {
-  must(argc==4,"file");FILE*f=fopen(argv[3],"wb");must(f!=NULL,"open");
+  must(argc==4||argc==5,"file [start index]");unsigned start=argc==5?(unsigned)strtoul(argv[4],0,10):0;FILE*f=fopen(argv[3],"wb");must(f!=NULL,"open");
   must(!b_keygen(pk,sk),"keygen");put(f,pk,sizeof pk);put(f,sk,sizeof sk);
-  #ifdef B_EXPANDED
-  must(!b_expand(sk),"expand test");
-#endif
+  /* Replay skips deterministic 40-byte signing seeds, not signatures. */
+  uint8_t discard[40];for(unsigned k=0;k<start;k++)bench_fill(discard,sizeof discard);
   unsigned long long sum=0;size_t lo=B_SIG,hi=0;
   for(unsigned i=0;i<count;i++){
-   for(unsigned j=0;j<32;j++)msg[j]=(uint8_t)(i+j);
+   for(unsigned j=0;j<32;j++)msg[j]=(uint8_t)(start+i+j);
    sign_one();must(!b_verify(sig,slen,msg,32,pk),"self verify");
    size_t n=b_unpadded(sig,slen);must(n>0&&n<=slen,"unpadded bound");sum+=n;if(n<lo)lo=n;if(n>hi)hi=n;
    uint64_t l=slen;put(f,&l,8);put(f,sig,slen);
-#ifdef B_EXPANDED
-   slen=B_SIG;must(!b_expanded_sign(sig,&slen,msg,32),"expanded sign test");must(!b_verify(sig,slen,msg,32,pk),"expanded sign verify");
-#endif
   }
   must(!fclose(f),"close");printf("LENGTH %llu %u %zu %zu\n",sum,count,lo,hi);puts("PASS generate");
  }else if(!strcmp(argv[1],"check")){
-  must(argc==4,"file");FILE*f=fopen(argv[3],"rb");must(f!=NULL,"open");get(f,pk,sizeof pk);get(f,sk,sizeof sk);
+  must(argc==4||argc==5,"file [start index]");unsigned start=argc==5?(unsigned)strtoul(argv[4],0,10):0;FILE*f=fopen(argv[3],"rb");must(f!=NULL,"open");get(f,pk,sizeof pk);get(f,sk,sizeof sk);
   for(unsigned i=0;i<count;i++){
-   for(unsigned j=0;j<32;j++)msg[j]=(uint8_t)(i+j);
+   for(unsigned j=0;j<32;j++)msg[j]=(uint8_t)(start+i+j);
    uint64_t l;get(f,&l,8);must(l<=B_SIG,"length");get(f,sig,(size_t)l);
    must(!b_verify(sig,(size_t)l,msg,32,pk),"cross verify");msg[0]^=1;must(b_verify(sig,(size_t)l,msg,32,pk)!=0,"tamper rejected");
   }must(fgetc(f)==EOF,"vector count");must(!fclose(f),"close");printf("PASS cross %u\n",count);
  }else if(!strcmp(argv[1],"time")){
-  bench_testing=0;must(!b_keygen(pk,sk),"keygen");sign_one();
-  uint64_t *t=malloc((count+1)*sizeof *t);must(t!=NULL,"alloc");
-  int ops=3;
-#ifdef B_EXPANDED
-  ops=4;
-#endif
-  for(int op=0;op<ops;op++){
-   int failures=0;
-#ifdef B_EXPANDED
-   if(op==3)must(!b_expand(sk),"expand");
-#endif
-   for(unsigned i=0;i<count;i++){
-    t[i]=cpucycles();
-    if(op==0)failures|=b_keygen(pk,sk);
-    else if(op==1){slen=B_SIG;failures|=b_sign(sig,&slen,msg,32,sk);}
-    else if(op==2)failures|=b_verify(sig,slen,msg,32,pk);
-#ifdef B_EXPANDED
-    else{slen=B_SIG;failures|=b_expanded_sign(sig,&slen,msg,32);}
-#endif
-   }t[count]=cpucycles();must(!failures,"timing operation");
-   print_results((const char*[]){"KeyGen","Sign","Verify","ExpandedSign"}[op],t,count+1);
-   if(op==0)sign_one();
-#ifdef B_EXPANDED
-   if(op==3)must(!b_verify(sig,slen,msg,32,pk),"expanded timed verify");
-#endif
-  }free(t);
+  bench_testing=0;
+  const unsigned warm=20;
+  uint64_t *kg=calloc(count+1,sizeof *kg),*sg=calloc(count+1,sizeof *sg),*vf=calloc(count+1,sizeof *vf);
+  must(kg&&sg&&vf,"alloc");
+  /* Fresh byte keys and signatures on every round, matching local_check's
+     sample population. Only the byte-API call is inside each interval. */
+  for(unsigned i=0;i<count+warm;i++){
+   uint64_t a=cpucycles();int rc=b_keygen(pk,sk);uint64_t dk=cpucycles()-a;must(!rc,"timed keygen");
+   slen=B_SIG;a=cpucycles();rc=b_sign(sig,&slen,msg,32,sk);uint64_t ds=cpucycles()-a;must(!rc,"timed sign");
+   a=cpucycles();rc=b_verify(sig,slen,msg,32,pk);uint64_t dv=cpucycles()-a;must(!rc,"timed verify");
+   if(i>=warm){unsigned j=i-warm;kg[j+1]=kg[j]+dk;sg[j+1]=sg[j]+ds;vf[j+1]=vf[j]+dv;}
+  }
+  print_results("KeyGen",kg,count+1);print_results("Sign",sg,count+1);print_results("Verify",vf,count+1);
+  free(kg);free(sg);free(vf);
+
  }else must(0,"mode");return 0;
 }

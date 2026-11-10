@@ -106,3 +106,163 @@ header/runtime/libm probe. Failure reports apt package build-essential
 (including libc6-dev). Exact extra per-build flags are printed near the
 SUMMARY heading as well as retained in metadata and logs. This final
 preflight/report change leaves the measured driver and QUICK values unchanged.
+
+
+## Current protocol and floating-point backend (2026-11-10)
+
+This section supersedes the old ref/vectorization/timing descriptions above.
+All modifications are inside bench/; no algorithm file, table, sampler, encoding
+or RNG call site has been modified. Tested revisions remain pinned. See
+[PROTOCOL.md](PROTOCOL.md) for the common byte-key rule from the LITHIUM audit;
+its separate local 3% numerical calibration is not claimed to have passed.
+
+System GCC uses -O3 -march=native -std=c99 -D_DEFAULT_SOURCE plus the recorded
+backend macros/options. _DEFAULT_SOURCE is required to declare getentropy and
+O_CLOEXEC used by the upstream Linux sysrng.c under strict C99; GNU C previously
+enabled these declarations implicitly. No extra -fno-tree-vectorize or
+-fno-tree-slp-vectorize is applied to the new builds. The source Makefiles use
+Clang/O2 or their artifact defaults, but those defaults are not required by the
+API; GCC/O3 follows the requested common protocol.
+
+Each timing round generates fresh byte-form keys, signs a 32-byte zero message
+from the byte sk (including decode and expansion), and verifies from the byte pk
+(including decode and hashing). Twenty complete warmup triples are discarded.
+Timing uses the upstream OS RNG, with no preexpanded key or cached matrix
+supplied by bench. The four Dilithium bba9534 timing files are unchanged;
+RDTSC intervals are passed to unchanged print_results for overhead subtraction
+and odd-sample medians in thousand ticks. No claim of equivalence with COPA's
+59-byte/RDTSCP/instrumented source workload is made.
+
+Main ref: FNDSA_AVX2=0, FNDSA_SSE2=1, FNDSA_NEON=0; -msse2 -mno-avx
+-mno-avx2 -mno-avx512f -mno-fma. It uses upstream hardware IEEE binary64 through
+SSE2 intrinsics, including packed operations in FFT. It is a non-AVX2 x86
+fallback, **not a pure-C portable double implementation**. The pinned sources
+have no FALCON_FPNATIVE selector: disabling SSE2 selects uint64_t fpr software
+emulation, not hardware double. The other native hardware paths use NEON or
+RISC-V inline assembly. Providing a pure-C hardware-double backend would require
+implementation changes, which are prohibited. The chosen existing SSE2 fallback
+is reported explicitly in metadata and SUMMARY rather than described as scalar
+portable C. This limitation awaits the user's backend preference if strict
+no-intrinsics portability remains mandatory.
+
+The original software configuration remains as soft, only in a supplemental
+SUMMARY table. The avx2 backend's source and selector options are retained;
+all builds adopt the fresh-triple timing protocol. Supplemental soft also
+participates in all six ordered cross-verification pairs per degree. Keygen is
+integer fixed-point; hardware-versus-emulated binary64 primarily concerns Sign.
+Neither package requires GMP or an external floating-point library.
+
+For comparison: Antrag ref uses native double/libm with its algorithm AVX2/FMA
+selectors disabled; HAWK ref keygen and signing are integer/fixed-point and use
+neither floating point nor GMP. Those repositories are read-only in this task.
+The three ref labels therefore describe different actual arithmetic backends.
+
+QUICK=1 uses 11 timing samples and 100 signatures per backend/degree, plus the
+unchanged configured native KAT/self-tests. FULL uses 10001 and 10000 locally.
+Actual encoded lengths still use the existing signature-bit parser checked
+against native comp_decode, never heuristic removal of trailing zero bytes.
+All per-backend means/maxima and first byte differences appear in SUMMARY.
+
+Byte equality is recorded for every backend pair, but cross-verification is
+the default acceptance criterion. Native KAT fixture values/assertions remain
+strict. STRICT_EQUAL=1 optionally also fails on a byte difference **after** all
+cross-verification checks and diagnostic records have been saved. All normal
+runs keep byte-difference evidence, not merely a pass/fail equality boolean.
+
+When a signature differs, diagnostics/<set>-<pair>/equality.json contains its
+first zero-based index and one-based sample, signing/keygen seed, message,
+complete signatures, hashes and byte offset; left/right.vectors retain a single
+replayable case with the encoded keys. No differing sample has been observed
+in the current c-fn-dsa QUICK corpus. This does not resolve an earlier FULL
+failure on a different machine/corpus size.
+
+
+## c-fn-dsa reproducibility audit and unresolved local FULL case
+
+c-fn-dsa is now the primary Falcon-family measurement. Tested code is
+1b858880dcac091b5e5f84f0e4d8617c35ba1392 (README's pre-standard FIPS 206 guess,
+not finalized FN-DSA or Falcon round-3). pk and padded signature sizes remain
+897/666 and 1793/1280 at q=12289; secret keys include a 64-byte public-key hash.
+These matching paper sizes do not imply interoperability with VecFalcon's older
+version: encoding/NTT public key, mu construction and sampler rules changed.
+The API exposes only encoded keys; there is no expanded-key Sign operation.
+
+Pinned README.md:82-84 says, concerning the Rust implementation:
+"It is interoperable (indeed, it reproduces the same test vectors)".
+README.md:67-69 says SHAKE256x4 was removed while "breaking test vector
+reproducibility". These support checking the provided shared KATs. They are
+not an explicit universal promise that every arbitrary seed yields identical
+signatures under every C compiler's backend/optimization settings. The searched
+README, Makefile, fndsa.h and test framework contain no such universal promise.
+Nevertheless sign_inner.h:16 requires exact IEEE binary64 roundTiesToEven,
+and its RISC-V note at 344-351 explicitly warns about compiler contraction.
+Thus we keep all native KATs and record every mismatch; we do not dismiss the
+reported discrepancy as an established harmless floating-point difference or
+assert that upstream never intends reproducibility. Default cross-verification
+is based on the documented public interoperability/KAT guarantees, without the
+old bench's unsupported universal equality assertion.
+
+Evidence in diagnosis/legacy-fma.json and legacy-avx2-fma.txt shows actual
+FMA instructions in the previous cloud GCC14 AVX2 binary built with
+-O3 -march=native. Fused multiply/add can round differently from a separate
+binary64 multiply and add. This is an observed build property and a plausible
+mechanism, **not proof that it caused the user's GCC11 FULL mismatch**.
+No implementation bug is diagnosed or patched without a reproducing sample.
+There is also a distinct final-arithmetic path in sign_core.c:192ff: software
+binary64 performs inverse FFT then modular integer basis arithmetic, while the
+hardware path applies the basis in FFT space before inverse FFT and rounding.
+Floating operation ordering therefore need not be identical merely because
+both backends use binary64. This too is a source-level difference, not an
+established explanation for the missing local failure case.
+Optional FP_CONTRACT=off applies -ffp-contract=off for a rounding ablation and
+is recorded in build metadata; it is not silently applied to historical results.
+
+The user's original failed FULL vectors are not present in this cloud checkout;
+only the earlier 100-sample QUICK vectors are available. Consequently the first
+FULL mismatching sample, and whether all of its 10000 signatures cross-verify,
+remain unknown. The old runner raised on equality before running cross-verify,
+so an old equality error alone supplies no verification verdict. The new runner
+saves diagnostics and cross-verifies before any optional strict equality stop.
+Cloud performed QUICK only, no 10000-sample search.
+
+### Inspect existing failed results locally (no signature generation)
+
+After updating bench, set RESULT to the **old failed FULL** result directory:
+
+```bash
+RESULT="$PWD/bench/results/<old-failed-full-timestamp>"
+LANG=C LC_ALL=C python3 bench/audit_vectors.py "$RESULT" --set FN-DSA-512
+```
+
+This parses the old ref/avx2 vectors, finds the first differing signature,
+derives its exact fixed seed/message, saves both signatures and verifies all
+existing signatures using the original binaries. It does not rerun keygen or
+signing. It prints NOT_RUN if original binaries are missing; missing vectors
+cannot be reconstructed from an equality exception alone. Its JSON includes
+both vector hashes, counts, key equality and verifier exit/output evidence.
+Report: diagnostics/FN-DSA-512-ref-avx2/report.json within that result directory.
+
+For that first case only, test the FMA hypothesis on the original local toolchain:
+
+```bash
+LANG=C LC_ALL=C python3 bench/replay_case.py "$RESULT" --set FN-DSA-512
+```
+
+This extracts the old tested commit locally, reads its recorded original flags,
+and builds three replay binaries: original software ref, original AVX2, AVX2
+with only -ffp-contract=off added. It generates exactly one signature per build
+at the first mismatching index (skip deterministic seed bytes, not preceding
+signatures), checks reproduction against the original signatures, and cross-
+verifies the single case in all combinations. No source is patched. The report
+only attributes this case to FP contraction when both originals reproduce and
+the no-contract AVX2 result equals the old ref signature. Otherwise cause stays
+unresolved. Requires binutils/objdump in addition to normal dependencies. It does
+not search or time a FULL corpus. Preserve work/single-case-replay before retrying.
+Report: diagnostics/FN-DSA-512-old-ref-avx2/replay-report.json.
+
+The final QUICK ref-backend-proof.json inspects algorithm and driver object
+files: SSE hardware FP is present and no YMM/ZMM/FMA instruction occurs there.
+The unchanged speed_print object uses base -march=native and may be compiler
+auto-vectorized, including AVX instructions on the cloud CPU; this is post-
+measurement statistics outside the timed algorithm call, not selection of an
+AVX2 algorithm backend. No extra auto-vectorization suppression is used.

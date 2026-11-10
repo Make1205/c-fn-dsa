@@ -1,0 +1,12 @@
+$ /workspace/c-fn-dsa/bench/results/20261110T102527.498956Z/work/FN-DSA-512-ref/kat
+[9]..........PASS native KAT
+$ /workspace/c-fn-dsa/bench/results/20261110T102527.498956Z/work/FN-DSA-512-avx2/kat
+[9]..........PASS native KAT
+$ /workspace/c-fn-dsa/bench/results/20261110T102527.498956Z/work/FN-DSA-512-soft/kat
+[9]..........PASS native KAT
+$ /workspace/c-fn-dsa/bench/results/20261110T102527.498956Z/work/FN-DSA-1024-ref/kat
+[10]..........PASS native KAT
+$ /workspace/c-fn-dsa/bench/results/20261110T102527.498956Z/work/FN-DSA-1024-avx2/kat
+[10]..........PASS native KAT
+$ /workspace/c-fn-dsa/bench/results/20261110T102527.498956Z/work/FN-DSA-1024-soft/kat
+[10]..........PASS native KAT

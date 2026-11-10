@@ -1,0 +1,15 @@
+   2fcfb:	c4 e2 f9 bc dd       	vfnmadd231pd %xmm5,%xmm0,%xmm3
+   2fd00:	c4 e2 d9 98 c6       	vfmadd132pd %xmm6,%xmm4,%xmm0
+   2ff5b:	c4 e2 f1 b8 d4       	vfmadd231pd %xmm4,%xmm1,%xmm2
+   2ff69:	c4 e2 f1 9c c4       	vfnmadd132pd %xmm4,%xmm1,%xmm0
+   3029c:	c4 e2 f9 bc d4       	vfnmadd231pd %xmm4,%xmm0,%xmm2
+   302a1:	c4 e2 f1 98 c3       	vfmadd132pd %xmm3,%xmm1,%xmm0
+   30360:	c4 e2 e9 98 c8       	vfmadd132pd %xmm0,%xmm2,%xmm1
+   306a4:	c4 62 c9 b8 c6       	vfmadd231pd %xmm6,%xmm6,%xmm8
+   306a9:	c4 42 b1 b8 d1       	vfmadd231pd %xmm9,%xmm9,%xmm10
+   306b7:	c4 62 b1 b8 d2       	vfmadd231pd %xmm2,%xmm9,%xmm10
+   306d0:	c4 e2 b1 9c ca       	vfnmadd132pd %xmm2,%xmm9,%xmm1
+   306d9:	c4 e2 e1 98 d2       	vfmadd132pd %xmm2,%xmm3,%xmm2
+   306de:	c4 62 c9 b8 c8       	vfmadd231pd %xmm0,%xmm6,%xmm9
+   306eb:	c4 e2 c9 9c e8       	vfnmadd132pd %xmm0,%xmm6,%xmm5
+   306f0:	c4 e2 d9 98 c0       	vfmadd132pd %xmm0,%xmm4,%xmm0

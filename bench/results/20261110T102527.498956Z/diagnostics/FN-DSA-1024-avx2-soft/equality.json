@@ -1,0 +1,14 @@
+{
+  "left": "/workspace/c-fn-dsa/bench/results/20261110T102527.498956Z/work/FN-DSA-1024-avx2.vectors",
+  "right": "/workspace/c-fn-dsa/bench/results/20261110T102527.498956Z/work/FN-DSA-1024-soft.vectors",
+  "left_sha256": "7779f3103015bcdbdc4076a6a24a79e64d6df345eae36f7c8dc1cece753e6b6e",
+  "right_sha256": "7779f3103015bcdbdc4076a6a24a79e64d6df345eae36f7c8dc1cece753e6b6e",
+  "left_count": 100,
+  "right_count": 100,
+  "pk_equal": true,
+  "sk_equal": true,
+  "byte_equal": true,
+  "differing_signatures": 0,
+  "count_equal": true,
+  "first_difference": null
+}

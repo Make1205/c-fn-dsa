@@ -1,0 +1,128 @@
+[
+  {
+    "set": "FN-DSA-512",
+    "count_each": 100,
+    "cross_builds": true,
+    "comparisons": [
+      {
+        "left": "ref",
+        "right": "avx2",
+        "byte_equal": true,
+        "differing_signatures": 0,
+        "first_sample": null,
+        "evidence": "diagnostics/FN-DSA-512-ref-avx2"
+      },
+      {
+        "left": "ref",
+        "right": "soft",
+        "byte_equal": true,
+        "differing_signatures": 0,
+        "first_sample": null,
+        "evidence": "diagnostics/FN-DSA-512-ref-soft"
+      },
+      {
+        "left": "avx2",
+        "right": "soft",
+        "byte_equal": true,
+        "differing_signatures": 0,
+        "first_sample": null,
+        "evidence": "diagnostics/FN-DSA-512-avx2-soft"
+      }
+    ],
+    "cross_verification": [
+      {
+        "verifier": "ref",
+        "signer": "avx2",
+        "status": "PASS"
+      },
+      {
+        "verifier": "ref",
+        "signer": "soft",
+        "status": "PASS"
+      },
+      {
+        "verifier": "avx2",
+        "signer": "ref",
+        "status": "PASS"
+      },
+      {
+        "verifier": "avx2",
+        "signer": "soft",
+        "status": "PASS"
+      },
+      {
+        "verifier": "soft",
+        "signer": "ref",
+        "status": "PASS"
+      },
+      {
+        "verifier": "soft",
+        "signer": "avx2",
+        "status": "PASS"
+      }
+    ]
+  },
+  {
+    "set": "FN-DSA-1024",
+    "count_each": 100,
+    "cross_builds": true,
+    "comparisons": [
+      {
+        "left": "ref",
+        "right": "avx2",
+        "byte_equal": true,
+        "differing_signatures": 0,
+        "first_sample": null,
+        "evidence": "diagnostics/FN-DSA-1024-ref-avx2"
+      },
+      {
+        "left": "ref",
+        "right": "soft",
+        "byte_equal": true,
+        "differing_signatures": 0,
+        "first_sample": null,
+        "evidence": "diagnostics/FN-DSA-1024-ref-soft"
+      },
+      {
+        "left": "avx2",
+        "right": "soft",
+        "byte_equal": true,
+        "differing_signatures": 0,
+        "first_sample": null,
+        "evidence": "diagnostics/FN-DSA-1024-avx2-soft"
+      }
+    ],
+    "cross_verification": [
+      {
+        "verifier": "ref",
+        "signer": "avx2",
+        "status": "PASS"
+      },
+      {
+        "verifier": "ref",
+        "signer": "soft",
+        "status": "PASS"
+      },
+      {
+        "verifier": "avx2",
+        "signer": "ref",
+        "status": "PASS"
+      },
+      {
+        "verifier": "avx2",
+        "signer": "soft",
+        "status": "PASS"
+      },
+      {
+        "verifier": "soft",
+        "signer": "ref",
+        "status": "PASS"
+      },
+      {
+        "verifier": "soft",
+        "signer": "avx2",
+        "status": "PASS"
+      }
+    ]
+  }
+]

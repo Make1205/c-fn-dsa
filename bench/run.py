@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import csv,datetime,hashlib,io,json,os,platform,re,shutil,subprocess,sys,tarfile
+import csv,datetime,hashlib,io,itertools,json,os,platform,re,shutil,subprocess,sys,tarfile
+from audit_vectors import inspect_pair
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
 BENCH=ROOT/'bench'
@@ -7,7 +8,9 @@ CFG=json.loads((BENCH/'config.json').read_text())
 ENV=dict(os.environ,LANG='C',LC_ALL='C',GIT_TERMINAL_PROMPT='0')
 for k in ('CPATH','C_INCLUDE_PATH','CPLUS_INCLUDE_PATH','LIBRARY_PATH','LD_LIBRARY_PATH','GCC_EXEC_PREFIX','COMPILER_PATH'):ENV.pop(k,None)
 CC='/usr/bin/gcc'
-BASE=['-O3','-march=native','-std=gnu11']
+BASE=['-O3','-march=native','-std=c99','-D_DEFAULT_SOURCE']
+if os.environ.get('FP_CONTRACT')=='off':BASE+=['-ffp-contract=off']
+elif os.environ.get('FP_CONTRACT'):raise RuntimeError('Only optional FP_CONTRACT=off is supported for rounding ablation')
 def call(args,cwd=ROOT,log=None):
  p=subprocess.run([str(x) for x in args],cwd=cwd,env=ENV,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
  s=p.stdout.decode(errors='replace')
@@ -45,7 +48,7 @@ def main():
  else:cpu=None
  stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ');out=BENCH/'results'/stamp;out.mkdir(parents=True)
  print('Results:',out,flush=True)
- meta={'scale':'QUICK' if quick else 'FULL','timing_iterations':nt,'signatures':ns,'cpu':platform.processor(),'affinity':cpu,'gcc':call([CC,'--version']).splitlines()[0],'benchmark_commit':call(['git','rev-parse','HEAD']).strip(),'tested_commit':CFG['tested_commit'],'initial_commit':CFG['initial_commit'],'initial_status':call(['git','status','--porcelain']),'flags':BASE,'configuration':CFG,'benchmark_hashes':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in BENCH.iterdir() if p.is_file()}}
+ meta={'scale':'QUICK' if quick else 'FULL','timing_iterations':nt,'signatures':ns,'cpu':platform.processor(),'affinity':cpu,'gcc':call([CC,'--version']).splitlines()[0],'benchmark_commit':call(['git','rev-parse','HEAD']).strip(),'tested_commit':CFG['tested_commit'],'initial_commit':CFG['initial_commit'],'initial_status':call(['git','status','--porcelain']),'protocol':'byte-keys-msg32-fresh-triples-warm20-v2','timing_warmup':20,'timing_key_population':'fresh key/signature per triple','timing_entropy':'upstream OS RNG','ref_backend':CFG['ref_backend'],'flags':BASE,'configuration':CFG,'benchmark_hashes':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in BENCH.iterdir() if p.is_file()}}
  if Path('/proc/cpuinfo').exists():meta['cpu']=re.search(r'^model name\s*:\s*(.*)$',Path('/proc/cpuinfo').read_text(),re.M)[1]
  (out/'metadata.json').write_text(json.dumps(meta,indent=2)+'\n')
  stage=out/'work'/'source';archive(CFG['tested_commit'],stage)
@@ -84,15 +87,27 @@ def main():
    vals=list(map(int,re.search(r'LENGTH (\d+) (\d+) (\d+) (\d+)',text).groups()))
    total,count,lo,hi=vals
    lengths.append({'set':row['name'],'build':v,'n':n,'q':q,'pk':pk,'sk':sk,'sig':sig,'count':count,'mean':total/count,'min':lo,'max':hi})
-  equal=None
-  if len(variants)==2:
-   equal=files[variants[0]].read_bytes()==files[variants[1]].read_bytes()
-   if row.get('require_equal',False) and not equal:raise RuntimeError('Expected byte equality failed: '+row['name'])
-  for v in variants:
-   other=variants[-1] if v==variants[0] else variants[0]
-   call([builds[row['name'],v],'check',ns,files[other]],log=out/'correctness.log')
-  correct.append({'set':row['name'],'count_each':ns,'cross_builds':len(variants)==2,'byte_equal':equal})
-  print('Correctness:',row['name'],correct[-1],flush=True)
+  comparisons=[];cross=[]
+  size=next(x for x in lengths if x['set']==row['name'])
+  for left,right in itertools.combinations(variants,2):
+   evidence=out/'diagnostics'/(row['name']+'-'+left+'-'+right)
+   detail=inspect_pair(files[left],files[right],size['pk'],size['sk'],CFG['key_seed_bytes'],dest=evidence)
+   evidence.mkdir(parents=True,exist_ok=True)
+   (evidence/'equality.json').write_text(json.dumps(detail,indent=2)+'\n')
+   comparisons.append(dict(left=left,right=right,byte_equal=detail['byte_equal'],differing_signatures=detail['differing_signatures'],first_sample=detail['first_difference']['sample_one_based'] if detail['first_difference'] else None,evidence=str(evidence.relative_to(out))))
+  item={'set':row['name'],'count_each':ns,'cross_builds':len(variants)>1,'comparisons':comparisons,'cross_verification':cross}
+  correct.append(item)
+  (out/'correctness.json').write_text(json.dumps(correct,indent=2)+'\n')
+  for verifier,signer in itertools.permutations(variants,2):
+   entry=dict(verifier=verifier,signer=signer,status='RUNNING');cross.append(entry)
+   try:
+    call([builds[row['name'],verifier],'check',ns,files[signer]],log=out/'correctness.log');entry['status']='PASS'
+   except Exception as exc:
+    entry['status']='FAIL';entry['error']=str(exc)
+    (out/'correctness.json').write_text(json.dumps(correct,indent=2)+'\n');raise
+   (out/'correctness.json').write_text(json.dumps(correct,indent=2)+'\n')
+  print('Correctness:',row['name'],item,flush=True)
+  if (row.get('require_equal') or os.environ.get('STRICT_EQUAL')=='1') and any(not x['byte_equal'] for x in comparisons):raise RuntimeError('Strict equality failed after cross-verification; see diagnostics/: '+row['name'])
  (out/'correctness.json').write_text(json.dumps(correct,indent=2)+'\n');(out/'lengths.json').write_text(json.dumps(lengths,indent=2)+'\n')
  for row in CFG['sets']:
   for variant in row['variants']:
@@ -105,12 +120,13 @@ def main():
     if not any(x['set']==row['name'] and x['build']==v and x['operation']==op for x in results):raise RuntimeError('Missing timing: '+key+' '+op)
  (out/'timings.json').write_text(json.dumps(results,indent=2)+'\n')
  with (out/'bench.csv').open('w',newline='') as f:
-  w=csv.DictWriter(f,fieldnames=list(results[0]));w.writeheader();w.writerows(results)
+  w=csv.DictWriter(f,fieldnames=list(results[0]),lineterminator='\n');w.writeheader();w.writerows(results)
  lookup={(x['set'],x['build'],x['operation']):x['kcycles'] for x in results}
  s='# '+CFG['scheme']+' — '+meta['scale']+'\n\n'
  s+='QUICK is a workflow check only. Full-scale figures are measured locally.\n\n' if quick else 'Full-scale local benchmark.\n\n'
  s+='CPU: '+meta['cpu']+'; affinity: '+str(cpu)+'. GCC: '+meta['gcc']+'.\n\nTested commit: `'+CFG['tested_commit']+'`. Benchmark commit: `'+meta['benchmark_commit']+'`.\n\n'
  s+='Base flags: `'+ ' '.join(BASE)+'`. Each operation: '+str(nt)+' iterations; correctness and lengths: '+str(ns)+' signatures per build/set. Message: 32 bytes. Median units: thousand RDTSC ticks.\n\n'
+ s+='Ref backend: '+CFG['ref_backend']+'\n\nTiming sample population: fresh KeyGen/Sign/Verify triple per round, 20 discarded warmup triples; upstream OS entropy.\n\n'
  s+='Exact per-build options (in addition to base flags and local include paths):\n\n'
  for rr in CFG['sets']:
   for vv in rr['variants']:
@@ -136,6 +152,17 @@ def main():
  s+='\nExpanded-key Sign (thousand ticks; `--` means no supported expanded-key API):\n\n| 参数集 | ref | AVX2 |\n|---|---:|---:|\n'
  for row in CFG['sets']:
   name=row['name'];s+='| '+name+' | '+' | '.join('%.3f'%lookup[name,v,'ExpandedSign'] if (name,v,'ExpandedSign') in lookup else '--' for v in ('ref','avx2'))+' |\n'
+ s+='\nSupplemental software binary64 (not the main ref; thousand ticks):\n\n| 参数集 | soft KeyGen/Sign/Verify |\n|---|---|\n'
+ for row in CFG['sets']:
+  name=row['name'];s+='| '+name+' | '+'/'.join('%.3f'%lookup[name,'soft',op] for op in ('KeyGen','Sign','Verify'))+' |\n'
+ s+='\nActual encoded length by backend (internal encoding parser; padding excluded):\n\n| 参数集 | Backend | Samples | Mean bytes | Max bytes |\n|---|---|---:|---:|---:|\n'
+ for x in lengths:
+  s+='| %s | %s | %d | %.4f | %d |\n'%(x['set'],x['build'],x['count'],x['mean'],x['max'])
+ s+='\nByte equality diagnostics (differences do not waive cross-verification):\n\n| 参数集 | Backend pair | Equal | Differing signatures | First differing sample (1-based) |\n|---|---|---|---:|---:|\n'
+ for item in correct:
+  for pair in item['comparisons']:
+   s+='| %s | %s / %s | %s | %d | %s |\n'%(item['set'],pair['left'],pair['right'],pair['byte_equal'],pair['differing_signatures'],pair['first_sample'] if pair['first_sample'] is not None else '--')
+ s+='\nAll ordered backend cross-verification pairs passed, including the supplemental software backend. First-difference signatures, seeds, message, offsets and hashes are retained under diagnostics/ when a difference occurs.\n'
  s+='\nCorrectness: all configured upstream KAT/self-tests passed; all generated signatures verified; changed messages rejected. Cross-build/equality details are in correctness.json.\n\n'
  s+=CFG.get('notes','')+'\n\nBuild flags and commands per variant are in config.json, metadata.json and build logs. All source is extracted locally from the tested commit; algorithm files are unchanged. See bench/NOTES.md.\n'
  (out/'SUMMARY.md').write_text(s)

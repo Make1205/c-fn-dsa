@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import csv,datetime,hashlib,io,itertools,json,os,platform,re,shutil,subprocess,sys,tarfile
 from audit_vectors import inspect_pair
+import fma_audit
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
 BENCH=ROOT/'bench'
@@ -8,9 +9,8 @@ CFG=json.loads((BENCH/'config.json').read_text())
 ENV=dict(os.environ,LANG='C',LC_ALL='C',GIT_TERMINAL_PROMPT='0')
 for k in ('CPATH','C_INCLUDE_PATH','CPLUS_INCLUDE_PATH','LIBRARY_PATH','LD_LIBRARY_PATH','GCC_EXEC_PREFIX','COMPILER_PATH'):ENV.pop(k,None)
 CC='/usr/bin/gcc'
-BASE=['-O3','-march=native','-std=c99','-D_DEFAULT_SOURCE']
-if os.environ.get('FP_CONTRACT')=='off':BASE+=['-ffp-contract=off']
-elif os.environ.get('FP_CONTRACT'):raise RuntimeError('Only optional FP_CONTRACT=off is supported for rounding ablation')
+BASE=['-O3','-march=native','-std=c99','-D_DEFAULT_SOURCE','-ffp-contract=off']
+if os.environ.get('FP_CONTRACT') not in (None,'off'):raise RuntimeError('FP contraction must remain off')
 def call(args,cwd=ROOT,log=None):
  p=subprocess.run([str(x) for x in args],cwd=cwd,env=ENV,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
  s=p.stdout.decode(errors='replace')
@@ -31,6 +31,7 @@ def archive(commit,path):
  shutil.copytree(BENCH,path/'bench',ignore=shutil.ignore_patterns('results','__pycache__'),dirs_exist_ok=True)
 
 def main():
+ fma_audit.preflight()
  if sys.version_info<(3,8):raise RuntimeError('Python >=3.8 required: apt install python3')
  if platform.machine()!='x86_64':raise RuntimeError('RDTSC/AVX2 benchmark requires x86-64')
  if not Path(CC).is_file():raise RuntimeError('Missing GCC: apt install build-essential')
@@ -48,7 +49,7 @@ def main():
  else:cpu=None
  stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ');out=BENCH/'results'/stamp;out.mkdir(parents=True)
  print('Results:',out,flush=True)
- meta={'scale':'QUICK' if quick else 'FULL','timing_iterations':nt,'signatures':ns,'cpu':platform.processor(),'affinity':cpu,'gcc':call([CC,'--version']).splitlines()[0],'benchmark_commit':call(['git','rev-parse','HEAD']).strip(),'tested_commit':CFG['tested_commit'],'initial_commit':CFG['initial_commit'],'initial_status':call(['git','status','--porcelain']),'protocol':'byte-keys-msg32-fresh-triples-warm20-v2','timing_warmup':20,'timing_key_population':'fresh key/signature per triple','timing_entropy':'upstream OS RNG','ref_backend':CFG['ref_backend'],'flags':BASE,'configuration':CFG,'benchmark_hashes':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in BENCH.iterdir() if p.is_file()}}
+ meta={'scale':'QUICK' if quick else 'FULL','timing_iterations':nt,'signatures':ns,'cpu':platform.processor(),'affinity':cpu,'gcc':call([CC,'--version']).splitlines()[0],'benchmark_commit':call(['git','rev-parse','HEAD']).strip(),'tested_commit':CFG['tested_commit'],'initial_commit':CFG['initial_commit'],'initial_status':call(['git','status','--porcelain']),'protocol':'byte-keys-msg32-fresh-triples-warm20-fp-contract-off-v3','timing_warmup':20,'timing_key_population':'fresh key/signature per triple','timing_entropy':'upstream OS RNG','ref_backend':CFG['ref_backend'],'flags':BASE,'configuration':CFG,'benchmark_hashes':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in BENCH.iterdir() if p.is_file()}}
  if Path('/proc/cpuinfo').exists():meta['cpu']=re.search(r'^model name\s*:\s*(.*)$',Path('/proc/cpuinfo').read_text(),re.M)[1]
  (out/'metadata.json').write_text(json.dumps(meta,indent=2)+'\n')
  stage=out/'work'/'source';archive(CFG['tested_commit'],stage)
@@ -69,6 +70,7 @@ def main():
    for name in ('cpucycles','speed_print'):
     obj=dest/(name+'.o');call([CC]+BASE+['-c',str(stage/'bench'/(name+'.c')),'-o',obj],folder,log);timers.append(obj)
    call([CC,str(dest/'driver.o')]+objs+extra+timers+variant.get('libs',[])+['-o',driver],folder,log)
+   fma_audit.audit(driver,[dest/'driver.o']+objs+extra+timers,out/(key+'-fma-audit.json'))
    for kat in variant.get('kat',[]):
     if 'command' in kat:
      text=call(kat['command'],folder,out/'kat.log')
@@ -106,8 +108,19 @@ def main():
     entry['status']='FAIL';entry['error']=str(exc)
     (out/'correctness.json').write_text(json.dumps(correct,indent=2)+'\n');raise
    (out/'correctness.json').write_text(json.dumps(correct,indent=2)+'\n')
+  if row['name']=='FN-DSA-512':
+   regression=out/'diagnostics'/'local-case-3462';regression.mkdir(parents=True,exist_ok=True);rv={}
+   for v in ('ref','avx2'):
+    rv[v]=regression/(v+'.vectors');call([builds[row['name'],v],'generate',1,rv[v],3461],log=out/'correctness.log')
+   case=inspect_pair(rv['ref'],rv['avx2'],size['pk'],size['sk'],CFG['key_seed_bytes'],dest=regression,start_index=3461)
+   case['regression_index_zero_based']=3461;case['cross_verification']=[]
+   (regression/'report.json').write_text(json.dumps(case,indent=2)+'\n')
+   for verifier,signer in [('ref','avx2'),('avx2','ref')]:
+    call([builds[row['name'],verifier],'check',1,rv[signer],3461],log=out/'correctness.log');case['cross_verification'].append(dict(verifier=verifier,signer=signer,status='PASS'))
+   (regression/'report.json').write_text(json.dumps(case,indent=2)+'\n')
+   if not case['byte_equal']:raise RuntimeError('Local case 3462 regression equality failed; see '+str(regression))
   print('Correctness:',row['name'],item,flush=True)
-  if (row.get('require_equal') or os.environ.get('STRICT_EQUAL')=='1') and any(not x['byte_equal'] for x in comparisons):raise RuntimeError('Strict equality failed after cross-verification; see diagnostics/: '+row['name'])
+  if ((row.get('require_equal') and any(not x['byte_equal'] for x in comparisons if {x['left'],x['right']}=={'ref','avx2'})) or (os.environ.get('STRICT_EQUAL')=='1' and any(not x['byte_equal'] for x in comparisons))):raise RuntimeError('Strict equality failed after cross-verification; see diagnostics/: '+row['name'])
  (out/'correctness.json').write_text(json.dumps(correct,indent=2)+'\n');(out/'lengths.json').write_text(json.dumps(lengths,indent=2)+'\n')
  for row in CFG['sets']:
   for variant in row['variants']:
@@ -164,6 +177,8 @@ def main():
    s+='| %s | %s / %s | %s | %d | %s |\n'%(item['set'],pair['left'],pair['right'],pair['byte_equal'],pair['differing_signatures'],pair['first_sample'] if pair['first_sample'] is not None else '--')
  s+='\nAll ordered backend cross-verification pairs passed, including the supplemental software backend. First-difference signatures, seeds, message, offsets and hashes are retained under diagnostics/ when a difference occurs.\n'
  s+='\nCorrectness: all configured upstream KAT/self-tests passed; all generated signatures verified; changed messages rejected. Cross-build/equality details are in correctness.json.\n\n'
+ s+='\nTargeted regression: local case 3462 (zero-based 3461) is replayed directly in addition to the normal corpus; ref/AVX2 byte equality and both cross-verification directions are required. See diagnostics/local-case-3462/report.json.\n'
+ s+='\nFMA audit: compiler contraction disabled; zero FMA instructions in every linked driver and benchmark-owned object. See *-fma-audit.json.\n'
  s+=CFG.get('notes','')+'\n\nBuild flags and commands per variant are in config.json, metadata.json and build logs. All source is extracted locally from the tested commit; algorithm files are unchanged. See bench/NOTES.md.\n'
  (out/'SUMMARY.md').write_text(s)
  print('PASS:',out/'SUMMARY.md',flush=True)

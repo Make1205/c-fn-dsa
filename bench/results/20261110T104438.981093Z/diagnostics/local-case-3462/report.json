@@ -1,0 +1,28 @@
+{
+  "left": "/workspace/c-fn-dsa/bench/results/20261110T104438.981093Z/diagnostics/local-case-3462/ref.vectors",
+  "right": "/workspace/c-fn-dsa/bench/results/20261110T104438.981093Z/diagnostics/local-case-3462/avx2.vectors",
+  "left_sha256": "ec0b8c4ed2e4b6551f48d6f003614638c08a16ce13530f7d4f2e1c4aa4d1df72",
+  "right_sha256": "ec0b8c4ed2e4b6551f48d6f003614638c08a16ce13530f7d4f2e1c4aa4d1df72",
+  "left_count": 1,
+  "right_count": 1,
+  "pk_equal": true,
+  "sk_equal": true,
+  "byte_equal": true,
+  "differing_signatures": 0,
+  "count_equal": true,
+  "first_difference": null,
+  "first_file_byte_offset": null,
+  "regression_index_zero_based": 3461,
+  "cross_verification": [
+    {
+      "verifier": "ref",
+      "signer": "avx2",
+      "status": "PASS"
+    },
+    {
+      "verifier": "avx2",
+      "signer": "ref",
+      "status": "PASS"
+    }
+  ]
+}

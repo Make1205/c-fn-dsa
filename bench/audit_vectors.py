@@ -33,7 +33,7 @@ def read_vectors(path, pk_bytes, sk_bytes):
         records.append((pos,data[pos+8:pos+8+n]));pos+=8+n
     return data,records
 
-def inspect_pair(left,right,pk_bytes,sk_bytes,key_seed_bytes,dest=None):
+def inspect_pair(left,right,pk_bytes,sk_bytes,key_seed_bytes,dest=None,start_index=0):
     a,ar=read_vectors(left,pk_bytes,sk_bytes);b,br=read_vectors(right,pk_bytes,sk_bytes)
     diffs=[i for i in range(min(len(ar),len(br))) if ar[i][1]!=br[i][1]]
     r=dict(left=str(left),right=str(right),left_sha256=hashlib.sha256(a).hexdigest(),
@@ -44,10 +44,10 @@ def inspect_pair(left,right,pk_bytes,sk_bytes,key_seed_bytes,dest=None):
     if diffs:
         i=diffs[0];x=ar[i][1];y=br[i][1]
         j=next((j for j in range(min(len(x),len(y))) if x[j]!=y[j]),min(len(x),len(y)))
-        r['first_difference']=dict(index_zero_based=i,sample_one_based=i+1,signature_byte_offset=j,
+        r['first_difference']=dict(index_zero_based=i+start_index,sample_one_based=i+start_index+1,signature_byte_offset=j,
             left_length=len(x),right_length=len(y),left_signature_sha256=hashlib.sha256(x).hexdigest(),
             right_signature_sha256=hashlib.sha256(y).hexdigest(),
-            left_signature_hex=x.hex(),right_signature_hex=y.hex(),**seeds(i,key_seed_bytes))
+            left_signature_hex=x.hex(),right_signature_hex=y.hex(),**seeds(i+start_index,key_seed_bytes))
         if dest:
             dest=Path(dest);dest.mkdir(parents=True,exist_ok=True)
             for label,data,records in [('left',a,ar),('right',b,br)]:

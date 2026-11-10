@@ -177,7 +177,7 @@ in the current c-fn-dsa QUICK corpus. This does not resolve an earlier FULL
 failure on a different machine/corpus size.
 
 
-## c-fn-dsa reproducibility audit and unresolved local FULL case
+## Historical reproducibility audit (local FULL case now resolved below)
 
 c-fn-dsa is now the primary Falcon-family measurement. Tested code is
 1b858880dcac091b5e5f84f0e4d8617c35ba1392 (README's pre-standard FIPS 206 guess,
@@ -220,7 +220,7 @@ is recorded in build metadata; it is not silently applied to historical results.
 The user's original failed FULL vectors are not present in this cloud checkout;
 only the earlier 100-sample QUICK vectors are available. Consequently the first
 FULL mismatching sample, and whether all of its 10000 signatures cross-verify,
-remain unknown. The old runner raised on equality before running cross-verify,
+were unknown at that stage; the user has since supplied the resolution recorded below. The old runner raised on equality before running cross-verify,
 so an old equality error alone supplies no verification verdict. The new runner
 saves diagnostics and cross-verifies before any optional strict equality stop.
 Cloud performed QUICK only, no 10000-sample search.
@@ -266,3 +266,31 @@ The unchanged speed_print object uses base -march=native and may be compiler
 auto-vectorized, including AVX instructions on the cloud CPU; this is post-
 measurement statistics outside the timed algorithm call, not selection of an
 AVX2 algorithm backend. No extra auto-vectorization suppression is used.
+
+
+## Resolved local FULL failure: FP contraction (user report, 2026-11-10)
+
+The user completed the original local investigation. First mismatch: sample
+3462, zero-based index 3461. The signatures differ starting at byte 41, using
+the byte-position convention in the user's report. Both signatures passed
+cross-verification. Original AVX2 contained 15 compiler-generated FMA
+instructions; adding only -ffp-contract=off reduced this count to zero and
+made that signature byte-identical to ref. replay_case.py reported
+avx2_no_contract_equals_old_ref=true. The cause is floating-point contraction,
+not an implementation defect. This is user-supplied local evidence; the original
+full vectors/replay JSON were not uploaded, and no raw hashes/seeds are invented.
+The report establishes this case; it is not a claim that all 10000 signatures
+of that historical run were independently checked in cloud.
+
+All three current variants (hardware ref, AVX2, supplemental software) now use
+-ffp-contract=off. An object/executable audit requires zero FMA. Ref/AVX2 byte
+equality is restored as a mandatory acceptance condition, in addition to all
+ordered cross-verifications; soft equality stays diagnostic unless STRICT_EQUAL=1.
+The old permissive-default description above is historical and superseded.
+Every QUICK/FULL run also replays index 3461 directly (skip seed bytes, not 3461
+signatures) and requires ref/AVX2 equality plus both cross-verifications. The
+100/10000 ordinary correctness and length samples remain separate from this
+single targeted regression. No algorithm implementation has been changed.
+
+For this paper's measurement c-fn-dsa is primary; VecFalcon is backup. Version
+and encoding differences from the older VecFalcon remain documented above.

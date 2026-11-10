@@ -1,0 +1,11 @@
+{
+  "provenance": "User report in this conversation; original local artifacts not uploaded",
+  "sample_one_based": 3462,
+  "index_zero_based": 3461,
+  "signature_difference_start_as_reported": 41,
+  "both_signatures_cross_verify": true,
+  "old_avx2_fma_count": 15,
+  "no_contract_avx2_fma_count": 0,
+  "avx2_no_contract_equals_old_ref": true,
+  "conclusion": "Floating-point contraction, not an implementation defect"
+}

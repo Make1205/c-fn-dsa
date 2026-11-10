@@ -40,3 +40,9 @@ python3 bench/replay_case.py /path/to/old/result --set FN-DSA-512
 The first command prints the first differing case and checks original cross-
 verification; the second replays only that case with original and no-contract
 compiler settings. The original vectors and metadata must still exist.
+
+Current mandatory rule: -ffp-contract=off for every normal run.sh build, zero
+FMA in all owned objects/drivers, mandatory ref/AVX2 byte equality plus cross-
+verification. Index 3461 is a targeted regression. STRICT_EQUAL=1 additionally
+requires equality involving supplemental software. Historical replay_case.py
+intentionally rebuilds old flags for diagnosis only, never for reported timing.

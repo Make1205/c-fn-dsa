@@ -8,6 +8,13 @@ Tested commit: `1b858880dcac091b5e5f84f0e4d8617c35ba1392`. Benchmark commit: `1b
 
 Base flags: `-O3 -march=native -std=gnu11`. Each operation: 11 iterations; correctness and lengths: 100 signatures per build/set. Message: 32 bytes. Median units: thousand RDTSC ticks.
 
+Exact per-build options (in addition to base flags and local include paths):
+
+* FN-DSA-512 ref: `-DLOGN=9 -DFNDSA_AVX2=0 -DFNDSA_SSE2=0 -DFNDSA_NEON=0 -ffunction-sections -fdata-sections -fno-tree-vectorize -fno-tree-slp-vectorize`; link `-Wl,--gc-sections`.
+* FN-DSA-512 avx2: `-DLOGN=9 -DFNDSA_AVX2=1 -DFNDSA_SSE2=1 -DFNDSA_NEON=0 -ffunction-sections -fdata-sections -mavx2 -mno-avx512f`; link `-Wl,--gc-sections`.
+* FN-DSA-1024 ref: `-DLOGN=10 -DFNDSA_AVX2=0 -DFNDSA_SSE2=0 -DFNDSA_NEON=0 -ffunction-sections -fdata-sections -fno-tree-vectorize -fno-tree-slp-vectorize`; link `-Wl,--gc-sections`.
+* FN-DSA-1024 avx2: `-DLOGN=10 -DFNDSA_AVX2=1 -DFNDSA_SSE2=1 -DFNDSA_NEON=0 -ffunction-sections -fdata-sections -mavx2 -mno-avx512f`; link `-Wl,--gc-sections`.
+
 | 参数集 | n | q | pk | sig（仓库实际） | 论文 sig | ref KeyGen/Sign/Verify | AVX2 KeyGen/Sign/Verify |
 |---|---:|---:|---:|---|---:|---|---|
 | FN-DSA-512 | 512 | 12289 | 897 | 666; unpadded avg 654.9100, max 661 | 666 | 7519.667/4676.437/41.053 | 4261.789/323.309/38.219 |

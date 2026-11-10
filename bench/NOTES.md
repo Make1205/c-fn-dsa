@@ -100,3 +100,9 @@ fndsa_keygen/fndsa_sign with system entropy; only correctness uses seeded APIs.
 Length statistics parse the LSB-first unary coefficient stream after the
 41-byte header/nonce prefix and independently validate lengths with comp_decode.
 No expanded-key/stateful signing API is exposed by this C implementation.
+
+Before any algorithm build, the runner also compile/links a standard C
+header/runtime/libm probe. Failure reports apt package build-essential
+(including libc6-dev). Exact extra per-build flags are printed near the
+SUMMARY heading as well as retained in metadata and logs. This final
+preflight/report change leaves the measured driver and QUICK values unchanged.
